@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>a — Kinetic Typography</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.min.js"></script>
+<script>
+new p5(p => {
+
+  /* ── Konfiguration ─────────────────────────────────────────────────────── */
+  const GAP       = 5;     // Rasterabstand beim Pixel-Sampling (px)
+  const BASE_AMP  = 16;    // Basis-Wellenamplitude (px)
+  const SPEED     = 0.018; // Wellengeschwindigkeit (t pro Frame)
+  const MOUSE_R   = 0.30;  // Maus-Einflussradius (relativ zur Canvas-Breite)
+  const MOUSE_AMP = 32;    // maximale Maus-Zusatzamplitude (px)
+
+  let dots = [];
+
+  /* ── Partikel aus unsichtbarer Buchstaben-Fläche erzeugen ─────────────── */
+  function buildDots() {
+    dots = [];
+
+    // Unsichtbares p5.Graphics-Objekt — "a" wird hier gezeichnet, nie auf dem Haupt-Canvas
+    const g = p.createGraphics(p.width, p.height);
+    g.pixelDensity(1);
+    g.background(0);
+    g.noStroke();
+    g.fill(255);
+    g.textFont('Georgia');
+    g.textSize(Math.min(p.width, p.height) * 0.78);
+    g.textAlign(p.CENTER, p.CENTER);
+    g.text('a', p.width / 2, p.height / 2);
+
+    // Pixel auslesen — Buchstabe bleibt dadurch auf dem sichtbaren Canvas verborgen
+    g.loadPixels();
+
+    for (let y = 0; y < p.height; y += GAP) {
+      for (let x = 0; x < p.width; x += GAP) {
+        const brightness = g.pixels[(y * p.width + x) * 4]; // R-Kanal
+        if (brightness > 80) {
+          dots.push({
+            hx: x,                       // Heimposition X (Buchstaben-Pixel)
+            hy: y,                       // Heimposition Y
+            r:  p.random(0.8, 2.6),     // Partikelradius
+            al: p.random(0.5, 1.0)      // Basis-Opacity
+          });
+        }
+      }
+    }
+
+    g.remove(); // Offscreen-Puffer freigeben
+  }
+
+  /* ── Setup ─────────────────────────────────────────────────────────────── */
+  p.setup = () => {
+    p.createCanvas(p.windowWidth, p.windowHeight);
+    p.pixelDensity(1);
+    buildDots();
+  };
+
+  /* ── Draw-Loop ──────────────────────────────────────────────────────────── */
+  p.draw = () => {
+    p.background(0, 22); // leichter Trail-Effekt
+    p.noStroke();
+
+    const t  = p.frameCount * SPEED;
+    const W  = p.width, H = p.height;
+
+    // Maus normalisiert: -0.5 … +0.5
+    const normMx = p.mouseX / W - 0.5;
+    const normMy = p.mouseY / H - 0.5;
+
+    // Amplitude atmet leicht (globales Pulsieren der Form)
+    const amp = BASE_AMP * (1 + 0.28 * Math.sin(t * 0.22));
+
+    for (const d of dots) {
+      // ── Wellen-Displacement ──────────────────────────────────────────────
+      // Zwei überlagerte Sinus-Wellen je Achse → strukturierte Wellenbewegung
+      const wx = Math.sin(d.hx * 0.013 + d.hy * 0.006 + t)        * amp
+               + Math.sin(d.hx * 0.005                  + t * 1.5) * amp * 0.35;
+
+      const wy = Math.cos(d.hx * 0.006 + d.hy * 0.013 + t * 0.82) * amp
+               + Math.cos(               d.hy * 0.005  + t * 1.2)  * amp * 0.35;
+
+      // ── Maus-Einfluss ────────────────────────────────────────────────────
+      // Cursor erzeugt lokale Wellenvergrößerung im eigenen Radius
+      const mdx = d.hx / W - 0.5 - normMx;
+      const mdy = d.hy / H - 0.5 - normMy;
+      const mDist   = Math.hypot(mdx, mdy);
+      const mBoost  = Math.max(0, 1 - mDist / MOUSE_R) * MOUSE_AMP;
+      const mAngle  = Math.atan2(mdy, mdx);
+
+      // Renderposition = Heimposition + Wellenversatz + Maus-Boost
+      const rx = d.hx + wx + Math.cos(mAngle) * mBoost;
+      const ry = d.hy + wy + Math.sin(mAngle) * mBoost;
+
+      // ── Partikelgröße & Opacity ──────────────────────────────────────────
+      // Stärker ausgelenkte Partikel wirken kleiner (Tiefenwirkung)
+      const mag  = Math.hypot(wx, wy) / amp;                    // 0 .. ~1.35
+      const sz   = d.r * (0.75 + mag * 0.55);
+
+      // Sanfte Helligkeitswelle läuft über den Buchstaben
+      const wOp  = 0.68 + 0.32 * Math.sin(d.hx * 0.011 + t * 0.9);
+
+      p.fill(255, d.al * wOp * 225);
+      p.circle(rx, ry, sz * 2);
+    }
+  };
+
+  /* ── Resize ─────────────────────────────────────────────────────────────── */
+  p.windowResized = () => {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    buildDots();
+  };
+
+});
+</script>
+</body>
+</html>

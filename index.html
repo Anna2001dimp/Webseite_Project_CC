@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project CC</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Landing Page ─────────────────────────────────────────────────────── -->
+  <div id="landingPage">
+    <canvas id="landing-grid"></canvas>
+    <p id="landing-desc">An intuitive & interactive web tool for creative video editing with custom-coded effects.</p>
+  </div>
+
+  <!-- ── Start Screen ─────────────────────────────────────────────────────── -->
+  <div id="startScreen">
+    <h1 id="logo"><span>T</span><span>h</span><span>e</span><span>&nbsp;</span><span>P</span><span>r</span><span>o</span><span>j</span><span>e</span><span>c</span><span>t</span><span>&nbsp;</span><span>C</span><span>C</span></h1>
+    <div id="startItems">
+      <div id="carousel-scene">
+        <div id="carousel-ring">
+        </div>
+      </div>
+      <div id="carousel-arrows">
+        <svg id="arrow-left" class="carousel-arrow" viewBox="0 0 40 40" width="40" height="40">
+          <polyline points="26,8 14,20 26,32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg id="arrow-right" class="carousel-arrow" viewBox="0 0 40 40" width="40" height="40">
+          <polyline points="14,8 26,20 14,32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <button id="btn-create"><span></span>+</span><span>&nbsp;</span><span></span>C</span><span>r</span><span>e</span><span>a</span><span>t</span><span>e</span><span>&nbsp;</span><span>n</span><span>e</span><span>w</span><span>&nbsp;</span><span>E</span><span>f</span><span>f</span><span>e</span><span>c</span><span>t</span></button>
+  </div>
+
+  <div class="hand-cursor"></div>
+  <div class="hand-cursor"></div>
+  <div class="thumb-cursor"></div>
+  <div class="thumb-cursor"></div>
+
+  <!-- ── Vorlage für neu erstellte Collections (Create new Collection) ─────── -->
+  <template id="project-page-template">
+    <div class="pixelationPage">
+
+      <div class="pp-collection-info">
+        <div class="collection-row">
+          <span class="col-label">Title</span>
+          <input type="text" class="pp-collection-title-input col-input" placeholder="Type in...">
+        </div>
+      </div>
+
+      <h1 class="pixelation-logo">The Project CC</h1>
+
+      <button class="pp-btn-delete-page">Delete this page</button>
+
+      <button class="pp-trim-reset" style="display:none">×</button>
+
+      <div class="pp-video-selection">
+        <div class="pp-sel-bar">
+          <button class="pp-sel-play">▶</button>
+          <button class="pp-sel-delete">Delete</button>
+        </div>
+      </div>
+
+      <div class="pp-camera-overlay" style="display:none;">
+        <div class="pp-camera-inner">
+          <canvas class="pp-camera-canvas"></canvas>
+          <div class="pp-camera-sel-bar">
+            <span class="pp-camera-delete">Delete</span>
+          </div>
+        </div>
+        <div class="pp-camera-handle" data-dir="nw"></div>
+        <div class="pp-camera-handle" data-dir="n"></div>
+        <div class="pp-camera-handle" data-dir="ne"></div>
+        <div class="pp-camera-handle" data-dir="e"></div>
+        <div class="pp-camera-handle" data-dir="se"></div>
+        <div class="pp-camera-handle" data-dir="s"></div>
+        <div class="pp-camera-handle" data-dir="sw"></div>
+        <div class="pp-camera-handle" data-dir="w"></div>
+      </div>
+
+      <div class="pp-upload-ui">
+        <button class="pp-btn-interaction">Interaction</button>
+        <button class="pp-btn-upload">Upload MP4</button>
+        <input type="file" class="pp-file-input" accept="video/mp4,video/*">
+        <button class="pp-btn-download" disabled>Download MP4</button>
+        <div class="pp-effects">
+          <button class="pp-effects-toggle" disabled>Effects</button>
+          <div class="pp-effects-sub">
+            <button class="pp-btn-mesh" disabled>Pixelation</button>
+            <button class="pp-btn-meshfx" disabled style="display:none">Mesh</button>
+            <button class="pp-btn-motionfx" disabled style="display:none">Motion &amp; Particles</button>
+            <div class="pp-glitch-group">
+              <button class="pp-btn-glitch-fx" disabled>Glitch</button>
+              <div class="pp-glitch-sub">
+                <button class="pp-glitch-sub-btn" data-glitch-mode="pixelsort">Pixel-Sorting</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="pp-pixel-panel">
+        <div class="pp-pixel-row">
+          <span class="pp-glitch-label">Pixel Count</span>
+          <input type="range" class="pp-pixel-count" min="0" max="100" value="2">
+          <span class="pp-glitch-val">2%</span>
+        </div>
+        <div class="pp-pixel-row">
+          <span class="pp-glitch-label">Brightness</span>
+          <input type="range" class="pp-pixel-brightness" min="-100" max="100" value="0">
+          <span class="pp-glitch-val">0%</span>
+        </div>
+        <div class="pp-pixel-row">
+          <span class="pp-glitch-label">Shadow</span>
+          <input type="range" class="pp-pixel-shadow" min="-100" max="100" value="0">
+          <span class="pp-glitch-val">0%</span>
+        </div>
+        <div class="pp-pixel-row">
+          <span class="pp-glitch-label">Focus Map</span>
+          <input type="range" class="pp-pixel-focus" min="0" max="100" value="0">
+          <span class="pp-glitch-val">0%</span>
+        </div>
+        <div class="pp-pixel-row">
+          <span class="pp-glitch-label">Scan Lines</span>
+          <input type="range" class="pp-pixel-scan" min="0" max="100" value="0">
+          <span class="pp-glitch-val">0%</span>
+        </div>
+      </div>
+
+      <div class="pp-cw-panel">
+        <div class="pp-cw-item">
+          <canvas class="pp-cw-canvas" data-zone="highlights" width="90" height="90"></canvas>
+          <span class="pp-cw-label">Highlights</span>
+          <div class="pp-cw-row">
+            <input type="range" class="pp-cw-strength" min="0" max="100" value="0">
+            <span class="pp-glitch-val">0%</span>
+          </div>
+        </div>
+        <div class="pp-cw-item">
+          <canvas class="pp-cw-canvas" data-zone="midtones" width="90" height="90"></canvas>
+          <span class="pp-cw-label">Midtones</span>
+          <div class="pp-cw-row">
+            <input type="range" class="pp-cw-strength" min="0" max="100" value="0">
+            <span class="pp-glitch-val">0%</span>
+          </div>
+        </div>
+        <div class="pp-cw-item">
+          <canvas class="pp-cw-canvas" data-zone="shadows" width="90" height="90"></canvas>
+          <span class="pp-cw-label">Shadows</span>
+          <div class="pp-cw-row">
+            <input type="range" class="pp-cw-strength" min="0" max="100" value="0">
+            <span class="pp-glitch-val">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-glitch-panel">
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Intensity</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-intensity" min="0" max="100" value="40">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">40%</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Slices</span>
+          <span class="pp-glitch-min">0</span>
+          <input type="range" class="pp-glitch-slices" min="0" max="30" value="12">
+          <span class="pp-glitch-max">30</span>
+          <span class="pp-glitch-val">12</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Offset</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-offset" min="0" max="100" value="30">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">30%</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Luma</span>
+          <span class="pp-glitch-min">0</span>
+          <input type="range" class="pp-glitch-luma" min="0" max="200" value="140">
+          <span class="pp-glitch-max">200</span>
+          <span class="pp-glitch-val">140</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Scan Lines</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-scan" min="0" max="100" value="20">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">20%</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Grauwerte</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-grayvalue" min="0" max="100" value="50">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">50%</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Horizontal</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-sort-h" min="0" max="100" value="0">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">0%</span>
+        </div>
+        <div class="pp-glitch-row">
+          <span class="pp-glitch-label">Vertical</span>
+          <span class="pp-glitch-min">0%</span>
+          <input type="range" class="pp-glitch-sort-v" min="0" max="100" value="0">
+          <span class="pp-glitch-max">100%</span>
+          <span class="pp-glitch-val">0%</span>
+        </div>
+      </div>
+
+      
+
+      <canvas class="pp-canvas"></canvas>
+
+      <div class="pp-export-overlay"></div>
+
+      <div class="pp-timeline-container">
+          <div class="pp-timeline">
+          <canvas class="pp-filmstrip"></canvas>
+          <div class="pp-loading-overlay">Loading Frames…</div>
+          <div class="pp-trim-overlay-left trim-overlay"></div>
+          <div class="pp-trim-overlay-right trim-overlay"></div>
+          <div class="pp-trim-left trim-handle"></div>
+          <div class="pp-trim-right trim-handle"></div>
+          <div class="pp-playhead"></div>
+        </div>
+      </div>
+
+      <video class="pp-video" muted playsinline></video>
+
+    </div>
+  </template>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
